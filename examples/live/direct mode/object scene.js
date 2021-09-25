@@ -2807,6 +2807,11 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetWhiteTexture.ts
+  function SetWhiteTexture() {
+    return SetWebGLTexture(WhiteTexture.get());
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Start.ts
   function Start(renderPass) {
     if (!renderPass.current2DCamera) {
@@ -3044,73 +3049,45 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
-  function BatchTexturedQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, u0, v0, u1, v1, r, g, b, a) {
-    F32[offset + 0] = x1;
-    F32[offset + 1] = y1;
-    F32[offset + 2] = u0;
-    F32[offset + 3] = v0;
-    F32[offset + 4] = textureIndex;
-    F32[offset + 5] = r;
-    F32[offset + 6] = g;
-    F32[offset + 7] = b;
-    F32[offset + 8] = a;
-    F32[offset + 9] = x2;
-    F32[offset + 10] = y2;
-    F32[offset + 11] = u0;
-    F32[offset + 12] = v1;
-    F32[offset + 13] = textureIndex;
-    F32[offset + 14] = r;
-    F32[offset + 15] = g;
-    F32[offset + 16] = b;
-    F32[offset + 17] = a;
-    F32[offset + 18] = x3;
-    F32[offset + 19] = y3;
-    F32[offset + 20] = u1;
-    F32[offset + 21] = v1;
-    F32[offset + 22] = textureIndex;
-    F32[offset + 23] = r;
-    F32[offset + 24] = g;
-    F32[offset + 25] = b;
-    F32[offset + 26] = a;
-    F32[offset + 27] = x1;
-    F32[offset + 28] = y1;
-    F32[offset + 29] = u0;
-    F32[offset + 30] = v0;
-    F32[offset + 31] = textureIndex;
-    F32[offset + 32] = r;
-    F32[offset + 33] = g;
-    F32[offset + 34] = b;
-    F32[offset + 35] = a;
-    F32[offset + 36] = x3;
-    F32[offset + 37] = y3;
-    F32[offset + 38] = u1;
-    F32[offset + 39] = v1;
-    F32[offset + 40] = textureIndex;
-    F32[offset + 41] = r;
-    F32[offset + 42] = g;
-    F32[offset + 43] = b;
-    F32[offset + 44] = a;
-    F32[offset + 45] = x4;
-    F32[offset + 46] = y4;
-    F32[offset + 47] = u1;
-    F32[offset + 48] = v0;
-    F32[offset + 49] = textureIndex;
-    F32[offset + 50] = r;
-    F32[offset + 51] = g;
-    F32[offset + 52] = b;
-    F32[offset + 53] = a;
-    return offset + 54;
+  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTriangle.ts
+  function BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, r, g, b, a) {
+    F32.set([
+      x1,
+      y1,
+      0,
+      0,
+      textureIndex,
+      r,
+      g,
+      b,
+      a,
+      x2,
+      y2,
+      0,
+      1,
+      textureIndex,
+      r,
+      g,
+      b,
+      a,
+      x3,
+      y3,
+      1,
+      1,
+      textureIndex,
+      r,
+      g,
+      b,
+      a
+    ], offset);
+    return offset + 27;
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/DrawFrame.ts
-  function DrawFrame(renderPass, texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    frame2 = texture.getFrame(frame2);
-    const textureIndex = SetWebGLTexture(texture);
-    const displayWidth = frame2.width * scaleX;
-    const displayHeight = frame2.height * scaleY;
-    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + displayHeight, x + displayWidth, y + displayHeight, x + displayWidth, y, frame2.u0, frame2.v0, frame2.u1, frame2.v1, 1, 1, 1, alpha);
+  // ../phaser-genesis/src/renderer/webgl1/draw/FillTriangle.ts
+  function FillTriangle(renderPass, x1, y1, x2, y2, x3, y3, red, green, blue, alpha) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 1);
+    const textureIndex = SetWhiteTexture();
+    BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, red, green, blue, alpha);
   }
 
   // ../phaser-genesis/src/config/banner/AddBanner.ts
@@ -3218,24 +3195,24 @@ void main (void)
   }
 
   // ../phaser-genesis/src/scenes/Install.ts
-  function Install(scene, config = {}) {
+  function Install(scene2, config = {}) {
     const sceneManager = SceneManagerInstance.get();
     const size = sceneManager.scenes.size;
     const sceneIndex = sceneManager.sceneIndex;
     const firstScene = size === 0;
     if (typeof config === "string") {
-      scene.key = config;
+      scene2.key = config;
     } else if (config || !config && firstScene) {
-      scene.key = GetConfigValue(config, "key", "scene" + sceneIndex.toString());
+      scene2.key = GetConfigValue(config, "key", "scene" + sceneIndex.toString());
     }
-    if (sceneManager.scenes.has(scene.key)) {
-      console.warn("Scene key already in use: " + scene.key);
+    if (sceneManager.scenes.has(scene2.key)) {
+      console.warn("Scene key already in use: " + scene2.key);
     } else {
-      sceneManager.scenes.set(scene.key, scene);
+      sceneManager.scenes.set(scene2.key, scene2);
       sceneManager.flush = true;
       sceneManager.sceneIndex++;
     }
-    WorldList.set(scene, []);
+    WorldList.set(scene2, []);
   }
 
   // ../phaser-genesis/src/scenes/RenderStats.ts
@@ -3293,11 +3270,11 @@ void main (void)
             s = new Scene(sceneCtor.key);
             if (sceneCtor.create)
               s.create = sceneCtor.create.bind(s);
-            if (sceneCtor.create)
+            if (sceneCtor.destroy)
               s.destroy = sceneCtor.destroy.bind(s);
-            if (sceneCtor.create)
+            if (sceneCtor.update)
               s.update = sceneCtor.update.bind(s);
-            if (sceneCtor.create)
+            if (sceneCtor.shutdown)
               s.shutdown = sceneCtor.shutdown.bind(s);
           }
           if (s.create) {
@@ -3310,13 +3287,13 @@ void main (void)
       const time = this.game.time;
       const delta = time.delta;
       const now = time.lastTick;
-      for (const scene of this.scenes.values()) {
-        const worlds2 = WorldList.get(scene);
+      for (const scene2 of this.scenes.values()) {
+        const worlds2 = WorldList.get(scene2);
         for (const world2 of worlds2) {
           world2.beforeUpdate(delta, now);
         }
-        if (scene.update) {
-          scene.update(delta, now);
+        if (scene2.update) {
+          scene2.update(delta, now);
         }
         for (const world2 of worlds2) {
           world2.update(delta, now);
@@ -3328,8 +3305,8 @@ void main (void)
     }
     preRender() {
       const gameFrame = this.game.time.frame;
-      for (const scene of this.scenes.values()) {
-        const worlds2 = WorldList.get(scene);
+      for (const scene2 of this.scenes.values()) {
+        const worlds2 = WorldList.get(scene2);
         for (const world2 of worlds2) {
           if (world2.preRender(gameFrame)) {
             this.flush = true;
@@ -3338,8 +3315,8 @@ void main (void)
       }
     }
     render(renderPass) {
-      for (const scene of this.scenes.values()) {
-        const worlds2 = WorldList.get(scene);
+      for (const scene2 of this.scenes.values()) {
+        const worlds2 = WorldList.get(scene2);
         for (const world2 of worlds2) {
           world2.renderGL(renderPass);
         }
@@ -3663,185 +3640,18 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/textures/GetTexture.ts
-  function GetTexture(key) {
-    return TextureManagerInstance.get().get(key);
-  }
-
-  // ../phaser-genesis/src/loader/CreateFile.ts
-  function CreateFile(key, url, skipCache = false) {
-    return {
-      key,
-      url,
-      skipCache
-    };
-  }
-
-  // ../phaser-genesis/src/loader/IsAbsoluteURI.ts
-  function IsAbsoluteURI(url) {
-    return /^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.test(url);
-  }
-
-  // ../phaser-genesis/src/loader/GetURL.ts
-  function GetURL(key, url, extension, loader) {
-    if (!url) {
-      url = `${key}.${extension}`;
-    }
-    if (IsAbsoluteURI(url)) {
-      return url;
-    } else if (loader) {
-      return `${loader.baseURL}${loader.path}${url}`;
-    } else {
-      return url;
-    }
-  }
-
-  // ../phaser-genesis/src/loader/RequestFile.ts
-  async function RequestFile(file, preload, onload, fileData) {
-    if (!preload(file)) {
-      return Promise.reject(file);
-    }
-    try {
-      const request = new Request(file.url, fileData?.requestInit);
-      file.response = await fetch(request);
-      if (file.response.ok && await onload(file)) {
-        return Promise.resolve(file);
+  // ../phaser-genesis/src/CreateGame.ts
+  function CreateGame(...settings) {
+    const game = new Game(...settings);
+    return new Promise((resolve) => {
+      if (game.isBooted) {
+        resolve(game);
       } else {
-        return Promise.reject(file);
+        Once(game, "boot", () => {
+          resolve(game);
+        });
       }
-    } catch (error) {
-      file.error = error;
-      return Promise.reject(file);
-    }
-  }
-
-  // ../phaser-genesis/src/loader/files/ImageFile.ts
-  function ImageFile(key, url, fileData = {}) {
-    return (loader) => {
-      const file = CreateFile(key, GetURL(key, url, "png", loader), fileData?.skipCache);
-      const textureManager = TextureManagerInstance.get();
-      const preload = () => {
-        return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
-      };
-      const onload = async (file2) => {
-        const blob = await file2.response.blob();
-        let image;
-        if (window && "createImageBitmap" in window && !fileData?.getImage) {
-          image = await createImageBitmap(blob);
-        } else {
-          image = await new Promise((resolve, reject) => {
-            const url2 = URL.createObjectURL(blob);
-            const img = new Image();
-            img.onload = () => {
-              URL.revokeObjectURL(url2);
-              resolve(img);
-            };
-            img.onerror = () => {
-              reject();
-            };
-            img.src = url2;
-            if (img.complete && img.width && img.height) {
-              img.onload = null;
-              img.onerror = null;
-              resolve(img);
-            }
-          });
-        }
-        if (!image) {
-          return false;
-        }
-        if (fileData.skipCache) {
-          file2.data = image;
-        } else if (textureManager.has(key)) {
-          file2.data = textureManager.update(key, image, fileData?.glConfig);
-        } else {
-          file2.data = textureManager.add(key, image, fileData?.glConfig);
-        }
-        return true;
-      };
-      return RequestFile(file, preload, onload, fileData);
-    };
-  }
-
-  // ../phaser-genesis/src/textures/parsers/SpriteSheetParser.ts
-  function SpriteSheetParser(texture, x, y, width, height, frameConfig) {
-    const {
-      frameWidth = null,
-      endFrame = -1,
-      margin = 0,
-      spacingX = 0,
-      spacingY = 0
-    } = frameConfig;
-    let {
-      frameHeight = null,
-      startFrame = 0
-    } = frameConfig;
-    if (!frameHeight) {
-      frameHeight = frameWidth;
-    }
-    if (frameWidth === null) {
-      throw new Error("SpriteSheetParser: Invalid frameWidth");
-    }
-    const row = Math.floor((width - margin + spacingX) / (frameWidth + spacingX));
-    const column = Math.floor((height - margin + spacingY) / (frameHeight + spacingY));
-    let total = row * column;
-    if (total === 0) {
-      console.warn("SpriteSheetParser: Frame config will result in zero frames");
-    }
-    if (startFrame > total || startFrame < -total) {
-      startFrame = 0;
-    }
-    if (startFrame < 0) {
-      startFrame = total + startFrame;
-    }
-    if (endFrame !== -1) {
-      total = startFrame + (endFrame + 1);
-    }
-    let fx = margin;
-    let fy = margin;
-    let ax = 0;
-    let ay = 0;
-    for (let i = 0; i < total; i++) {
-      ax = 0;
-      ay = 0;
-      const w = fx + frameWidth;
-      const h = fy + frameHeight;
-      if (w > width) {
-        ax = w - width;
-      }
-      if (h > height) {
-        ay = h - height;
-      }
-      texture.addFrame(i, x + fx, y + fy, frameWidth - ax, frameHeight - ay);
-      fx += frameWidth + spacingX;
-      if (fx + frameWidth > width) {
-        fx = margin;
-        fy += frameHeight + spacingY;
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/loader/files/SpriteSheetFile.ts
-  function SpriteSheetFile(key, url, frameConfig, fileData = {}) {
-    return async (loader) => {
-      try {
-        const load = ImageFile(key, url, Object.assign({}, fileData, { skipCache: false }));
-        const file = await load(loader);
-        const texture = GetTexture(key);
-        if (texture) {
-          SpriteSheetParser(texture, 0, 0, texture.width, texture.height, frameConfig);
-        }
-        return Promise.resolve(file);
-      } catch (error) {
-        return Promise.reject();
-      }
-    };
-  }
-
-  // ../phaser-genesis/src/loader/files/LoadSpriteSheetFile.ts
-  async function LoadSpriteSheetFile(key, url, frameConfig, fileData = {}) {
-    const load = SpriteSheetFile(key, url, frameConfig, fileData);
-    return load();
+    });
   }
 
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
@@ -4677,21 +4487,21 @@ void main (void)
     stack;
     totalChildren = 0;
     totalChildrenQuery;
-    constructor(scene) {
+    constructor(scene2) {
       super();
       const id = this.id;
       const tag = this.tag;
-      this.scene = scene;
+      this.scene = scene2;
       this.totalChildrenQuery = defineQuery([tag]);
       SetWorldID(id, id);
-      WorldList.get(scene).push(this);
+      WorldList.get(scene2).push(this);
       this.color = new Color(id);
       this.events = new Map();
       this.renderData = CreateWorldRenderData();
       this.stack = new Uint32Array(256);
       SetWillTransformChildren(id, false);
       SetWillCacheChildren(id, false);
-      Once(scene, SceneDestroyEvent, () => this.destroy());
+      Once(scene2, SceneDestroyEvent, () => this.destroy());
     }
     getNumChildren() {
       if (this.updateDisplayList) {
@@ -5207,8 +5017,8 @@ void main (void)
   // ../phaser-genesis/src/world/StaticWorld.ts
   var StaticWorld = class extends BaseWorld {
     type = "StaticWorld";
-    constructor(scene) {
-      super(scene);
+    constructor(scene2) {
+      super(scene2);
       const renderer = RendererInstance.get();
       this.camera = new StaticCamera(renderer.width, renderer.height);
     }
@@ -5223,26 +5033,16 @@ void main (void)
     }
   };
 
-  // examples/src/direct mode/draw frame.ts
-  var Demo = class extends Scene {
-    constructor() {
-      super();
-      this.create();
-    }
-    async create() {
-      await LoadSpriteSheetFile("tiles", "assets/fantasy-tiles.png", { frameWidth: 64 });
-      const texture = GetTexture("tiles");
+  // examples/src/direct mode/object scene.ts
+  var scene = {
+    key: "main",
+    create() {
       const world2 = new StaticWorld(this);
       On(world2, WorldPostRenderEvent, (renderPass) => {
-        DrawFrame(renderPass, texture, 52, 64, 270);
-        DrawFrame(renderPass, texture, 49, 192, 270);
-        DrawFrame(renderPass, texture, 25, 320, 270);
-        DrawFrame(renderPass, texture, 7, 448, 270);
-        DrawFrame(renderPass, texture, 23, 576, 270);
-        DrawFrame(renderPass, texture, 31, 704, 270);
+        FillTriangle(renderPass, 100, 100, 100, 200, 200, 200, 0, 1, 0, 1);
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
+  CreateGame(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(scene));
 })();
-//# sourceMappingURL=draw frame.js.map
+//# sourceMappingURL=object scene.js.map

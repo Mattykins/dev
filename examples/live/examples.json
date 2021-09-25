@@ -114,6 +114,11 @@
           "path": "examples/live/direct mode/no scene.js",
           "name": "no scene.js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/object scene.js",
+          "name": "object scene.js",
+          "type": "file"
         }
       ],
       "type": "directory"
